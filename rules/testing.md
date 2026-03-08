@@ -1,10 +1,8 @@
 # Testing Guidelines
 
-## Framework: Vitest (Planned Migration)
+## Framework: Vitest
 
-Currently using a Jest placeholder. Migrating to Vitest to match viem's testing stack.
-
-### Vitest Configuration (Target)
+### Vitest Configuration
 
 ```typescript
 // vitest.config.ts

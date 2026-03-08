@@ -4,20 +4,15 @@
 
 Follow patterns established by [viem](https://github.com/wevm/viem). When in doubt, check how viem does it.
 
-## Formatting (Current: Prettier → Planned: Biome)
+## Formatting: Biome
 
-Current config (`.prettierrc`):
-- `arrowParens: "avoid"`
-- `printWidth: 120`
-- `singleQuote: true`
-
-Planned Biome config:
+Configured in `biome.json`:
 - Indent: 2 spaces
-- Line width: 80
+- Line width: 120
 - Single quotes
 - Trailing commas (all)
-- No semicolons
-- `noBarrelFile` rule enabled
+
+Run with `pnpm lint` (check) or `pnpm lint:fix` (auto-fix). Formatting with `pnpm format`.
 
 ## Naming Conventions
 

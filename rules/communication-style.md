@@ -28,6 +28,31 @@ See also: `.claude/PR_REVIEW_GUIDE.md`
 - **First comments can open with brief positive framing**: One line max
 - **Corrections are direct**: "This is not accurate — [correct fact]"
 
+## Documentation PR Reviews (`site/`)
+
+In addition to the general PR review rules above, docs PRs have additional review scope:
+
+### Critical (Must Fix)
+
+- Contract addresses and chain IDs match `src/const.ts`
+- RPC methods match `newton-prover-avs/docs/RPC_API.md`
+- SDK usage matches current API exports and types in `src/`
+- CLI commands match `newton-cli` actual behavior
+- Gateway URLs are correct (staging vs production, Sepolia vs Mainnet vs Base Sepolia)
+- All internal links resolve to existing pages
+- `site/docs.json` updated if pages were added, moved, or removed
+- Redirects added if pages were moved
+- Code examples are complete and runnable (no broken imports)
+
+### Warnings (Should Fix)
+
+- Newton terminology used consistently (see `site-content-style.md`)
+- Active voice, second person, present tense; no marketing language
+- Structure: lead with what, then why, then how; code within 2 scrolls
+- First mentions of concepts link to their reference pages
+- Frontmatter has required `title` and recommended `description`
+- Right Mintlify component for the job (CodeGroup, Steps, Tabs, Accordion)
+
 ## What NOT to Do (Applies Everywhere)
 
 - No "Overall review from Dennis:" self-labels

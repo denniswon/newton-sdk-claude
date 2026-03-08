@@ -11,10 +11,10 @@ Newton SDK (`@magicnewton/newton-protocol-sdk`) is a TypeScript client-side SDK 
 | Language        | TypeScript (strict mode)            |
 | Package Manager | pnpm                                |
 | Bundler         | Rollup (dual CJS + ESM output)     |
-| Linting         | Biome (planned migration from ESLint + Prettier) |
-| Testing         | Vitest (planned migration from Jest placeholder) |
-| Versioning      | Changesets (planned migration from `auto`) |
-| Git Hooks       | simple-git-hooks (planned migration from Husky) |
+| Linting         | Biome                                   |
+| Testing         | Vitest                                  |
+| Versioning      | `auto` (Changesets migration planned)   |
+| Git Hooks       | simple-git-hooks + lint-staged          |
 | Blockchain      | viem ^2.x                           |
 | Node            | >= 20                               |
 
@@ -29,12 +29,12 @@ import { createPublicClient, createWalletClient } from 'viem'
 import { newtonPublicClientActions, newtonWalletClientActions } from '@magicnewton/newton-protocol-sdk'
 
 const publicClient = createPublicClient({ ... }).extend(newtonPublicClientActions())
-const walletClient = createWalletClient({ ... }).extend(newtonWalletClientActions())
+const walletClient = createWalletClient({ ... }).extend(newtonWalletClientActions({ apiKey: 'your-api-key' }))
 ```
 
 **Public client actions** (read-only): `waitForTaskResponded`, `getTaskStatus`, policy reads, `precomputePolicyId`
 
-**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes
+**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions (feature branch)
 
 ### Module Structure
 
@@ -48,7 +48,8 @@ src/
 │   └── newtonPolicyAbi.ts # Policy contract ABI
 ├── modules/
 │   ├── avs/              # Core AVS interaction (task submission, evaluation, WebSocket)
-│   └── policy/           # Policy contract read/write wrappers
+│   ├── policy/           # Policy contract read/write wrappers
+│   └── privacy/          # HPKE encryption, Ed25519 signing, upload helpers (feature branch)
 ├── service/
 │   └── popup.ts          # Newton Wallet popup window management
 ├── types/
@@ -100,25 +101,29 @@ All client actions accept optional `SdkOverrides` for custom gateway URL, task m
 | `pnpm format` | Run formatter |
 | `pnpm test` | Run tests |
 | `pnpm typecheck` | Run `tsc --noEmit` |
+| `pnpm check:exports` | Validate package exports with publint |
+| `pnpm check:size` | Check bundle size limits (50 kB per entry) |
+| `pnpm check:unused` | Detect dead code with knip |
+| `pnpm check:all` | Run all quality checks (`check:exports` + `check:size`) |
 | `pnpm sync-abis` | Sync ABIs from newton-prover-avs (TODO: set up script) |
 
 ## Planned Migrations
 
 | From | To | Status |
 |------|----|--------|
-| ESLint + Prettier | Biome | Planned |
-| Jest (placeholder) | Vitest | Planned |
 | `auto` versioning | Changesets (`@changesets/cli`) | Planned |
-| Husky | simple-git-hooks | Planned |
 
-## Privacy Module (Planned — NEWT-627, NEWT-182)
+## Privacy Module (feature branches — NEWT-627, NEWT-182)
 
-Client-side-only HPKE encryption for privacy-preserving policy evaluation. Design constraints:
-- Zero server round-trips during `encrypt()` — fully offline capable
-- Bundle size < 50KB for the privacy module
+Client-side HPKE encryption for privacy-preserving policy evaluation. Implemented on `feature/sdk-privacy-module` (NEWT-627) and `feature/sdk-privacy-apis` (NEWT-182), pending merge to main.
+
+Exports: `createSecureEnvelope`, `generateSigningKeyPair`, `signPrivacyAuthorization`, `getPrivacyPublicKey`, `uploadEncryptedData`, `storeEncryptedSecrets`
+
+Key properties:
+- Zero server round-trips during encryption — fully offline capable
 - HPKE suite: X25519 KEM + HKDF-SHA256 + ChaCha20-Poly1305 (RFC 9180)
 - Ed25519 authorization signatures for consent-based data access
-- Will expose: `encryptPrivacyData()`, `uploadEncryptedData()`, `authorizePrivacyData()`
+- 11 unit tests covering envelope creation, key generation, and dual-signature authorization
 
 See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
 
@@ -132,6 +137,52 @@ See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
 6. **Type-safe contract interactions** — leverage viem's type inference from ABIs
 7. **Minimal dependencies** — keep the dependency tree small for a client-side library
 
+## Documentation Site (`site/`)
+
+The `site/` directory contains the full [docs.newt.foundation](https://docs.newt.foundation) documentation site, hosted via [Mintlify](https://mintlify.com). It was imported from the `foundation-docs` repo via `git subtree`.
+
+### Structure
+
+```
+site/
+├── docs.json                    # Mintlify config (navigation, redirects, SEO)
+├── style.css                    # Custom CSS overrides
+├── favicon.svg
+├── developers/                  # Developers tab (34 pages)
+│   ├── overview/                #   Getting Started
+│   ├── guides/                  #   Guides
+│   ├── concepts/                #   Deep Dives
+│   ├── reference/               #   Reference (SDK, RPC API, CLI, Contracts, Errors, Glossary)
+│   ├── advanced/                #   Advanced (Rego, Secrets, WASM)
+│   └── resources/               #   Resources (FAQ, Testing, Deployment)
+├── whitepaper/                  # Whitepaper tab (10 pages)
+├── protocol/                    # Protocol tab (8 pages)
+├── newton-protocol/             # Legacy pages (redirected)
+├── images/                      # Content images
+├── logo/                        # Light/dark logos
+└── og/                          # OpenGraph/Twitter social images
+```
+
+### Key Commands
+
+| Command | Purpose |
+|---------|---------|
+| `cd site && mintlify dev` | Local preview at localhost:3000 |
+| `cd site && mintlify broken-links` | Check for broken links |
+| `pnpm docs:check` | Verify TypeScript code samples via twoslash-cli |
+
+### Mintlify Deployment
+
+Mintlify deploys from this repo's `site/` directory via its GitHub App integration (monorepo mode, documentation path: `/site`). Auto-deploys on push to main.
+
+### Docs-SDK Sync
+
+When modifying SDK source (`src/`), update corresponding docs in `site/developers/`. The `/docs-sync` skill handles this. Key sync points:
+
+- New/changed exports → `site/developers/reference/sdk-reference.mdx`
+- New chain support → `site/developers/reference/contract-addresses.mdx`
+- New RPC methods → `site/developers/reference/rpc-api.mdx`
+
 ## Modular Rules
 
 Detailed guidelines are in `.claude/rules/`:
@@ -144,6 +195,10 @@ Detailed guidelines are in `.claude/rules/`:
 | `security.md` | Client-side crypto, key handling, bundle safety |
 | `communication-style.md` | PR review tone, comment conventions |
 | `lessons.md` | Recurring mistakes and prevention rules |
+| `site-content-style.md` | Documentation writing style, voice, terminology |
+| `site-mintlify.md` | Mintlify components, docs.json, page management |
+| `site-newton-knowledge.md` | Newton Protocol knowledge base for docs accuracy |
+| `site-agent-guide.md` | Agent behavior rules for `site/` directory work |
 
 ## Related Repositories
 
