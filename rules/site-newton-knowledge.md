@@ -48,7 +48,7 @@ Newton Protocol is a **policy engine for onchain transaction authorization**, bu
 | `newt_storeEncryptedSecrets` | Store encrypted secrets for a PolicyClient |
 | `newt_registerWebhook` | Register a webhook for task completion notifications |
 
-**Authentication:** All API requests require a Bearer token in the `Authorization` header or `X-API-Key` header.
+**Authentication:** All API requests require a Bearer token in the `Authorization` header.
 
 ## Key Smart Contracts
 

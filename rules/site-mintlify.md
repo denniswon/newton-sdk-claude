@@ -17,7 +17,8 @@ Page content in MDX...
 
 - `title` is **required** — displayed as the page heading and in navigation
 - `description` is **recommended** — used for SEO meta description
-- No other frontmatter properties are used in this project
+- `keywords` is **optional** — used for per-page SEO meta keywords (YAML array format)
+- Other frontmatter properties (`og:image`, `noindex`) are available but rarely used
 
 ## Components
 

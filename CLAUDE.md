@@ -68,7 +68,7 @@ src/
 ### Gateway Communication
 
 The SDK communicates with the Newton Gateway via JSON-RPC 2.0:
-- **HTTP**: `AvsHttpService` sends requests with `X-API-Key` header
+- **HTTP**: `AvsHttpService` sends requests with `Authorization: Bearer` header
 - **WebSocket**: `getTaskEventsWebSocket` subscribes to task topics with API key as query param
 - Gateway URLs are resolved per chain from `GATEWAY_API_URLS` in `const.ts`
 

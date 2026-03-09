@@ -67,7 +67,7 @@ When modifying SDK source code (`src/`), check if documentation needs updating:
 The Developers tab is organized as:
 
 ```
-Getting Started -> Guides -> Deep Dives -> Reference -> Advanced -> Resources
+Getting Started -> Guides -> Use Cases -> Deep Dives -> Reference -> Advanced -> Resources
 ```
 
 When adding new content, place it in the appropriate group.

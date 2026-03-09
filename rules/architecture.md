@@ -90,7 +90,7 @@ Utility: `precomputePolicyId` (replicates Solidity `setPolicy` keccak256 client-
 
 Shared utilities. Each file is standalone — no cross-dependencies between utils.
 
-- `https.ts` — `AvsHttpService` (JSON-RPC 2.0 over HTTP with `X-API-Key`)
+- `https.ts` — `AvsHttpService` (JSON-RPC 2.0 over HTTP with `Authorization: Bearer`)
 - `intent.ts` — Intent normalization and hex conversion for gateway
 - `task-events.ts` — WebSocket subscription to task topics
 - `cache-request.ts` — `fetchWithCache` (localStorage, configurable stale time)
@@ -130,7 +130,7 @@ sequenceDiagram
 ```
 
 - Base URL resolved from `GATEWAY_API_URLS[chainId]`
-- `X-API-Key` header for authentication
+- `Authorization: Bearer` header for authentication
 - Standard JSON-RPC 2.0 envelope (`{jsonrpc, method, params, id}`)
 
 ### WebSocket (Task Events)

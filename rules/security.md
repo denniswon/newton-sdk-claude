@@ -98,7 +98,7 @@ function validateGatewayUrl(url: string): void {
 
 ### API Key Handling
 
-- API keys passed as `X-API-Key` header (HTTP) or query param (WebSocket)
+- API keys passed as `Authorization: Bearer` header (HTTP) or query param (WebSocket)
 - Never log API keys
 - Never store API keys in localStorage
 - Consumer is responsible for key rotation
