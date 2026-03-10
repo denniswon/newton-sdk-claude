@@ -32,9 +32,9 @@ const publicClient = createPublicClient({ ... }).extend(newtonPublicClientAction
 const walletClient = createWalletClient({ ... }).extend(newtonWalletClientActions({ apiKey: 'your-api-key' }))
 ```
 
-**Public client actions** (read-only): `waitForTaskResponded`, `getTaskStatus`, policy reads, `precomputePolicyId`
+**Public client actions** (read-only): `waitForTaskResponded`, `getTaskStatus`, `getTaskResponseHash`, policy reads, `precomputePolicyId`
 
-**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions (feature branch)
+**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions
 
 ### Module Structure
 
@@ -49,7 +49,8 @@ src/
 ├── modules/
 │   ├── avs/              # Core AVS interaction (task submission, evaluation, WebSocket)
 │   ├── policy/           # Policy contract read/write wrappers
-│   └── privacy/          # HPKE encryption, Ed25519 signing, upload helpers (feature branch)
+│   └── privacy/          # HPKE encryption, Ed25519 signing, upload helpers
+├── popup-prompt.ts       # Newton Wallet popup overlay renderer
 ├── service/
 │   └── popup.ts          # Newton Wallet popup window management
 ├── types/
@@ -62,7 +63,10 @@ src/
     ├── task-events.ts    # WebSocket task event subscription
     ├── cache-request.ts  # localStorage-based fetch cache
     ├── promise-tools.ts  # PromiEvent (Promise + EventEmitter hybrid)
-    └── events.ts         # Typed EventEmitter
+    ├── events.ts         # Typed EventEmitter
+    ├── json-rpc.ts       # createJsonRpcRequestPayload builder
+    ├── jwt.ts            # decodeJWT — JWT header/payload decoder
+    └── task.ts           # convertLogToTaskResponse — on-chain log converter
 ```
 
 ### Gateway Communication
@@ -113,9 +117,9 @@ All client actions accept optional `SdkOverrides` for custom gateway URL, task m
 |------|----|--------|
 | `auto` versioning | Changesets (`@changesets/cli`) | Planned |
 
-## Privacy Module (feature branches — NEWT-627, NEWT-182)
+## Privacy Module
 
-Client-side HPKE encryption for privacy-preserving policy evaluation. Implemented on `feature/sdk-privacy-module` (NEWT-627) and `feature/sdk-privacy-apis` (NEWT-182), pending merge to main.
+Client-side HPKE encryption for privacy-preserving policy evaluation. Shipped on main.
 
 Exports: `createSecureEnvelope`, `generateSigningKeyPair`, `signPrivacyAuthorization`, `getPrivacyPublicKey`, `uploadEncryptedData`, `storeEncryptedSecrets`
 

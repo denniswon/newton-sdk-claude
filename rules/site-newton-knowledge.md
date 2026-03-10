@@ -46,7 +46,9 @@ Newton Protocol is a **policy engine for onchain transaction authorization**, bu
 | `newt_simulatePolicyData` | Simulate a PolicyData WASM oracle execution |
 | `newt_simulatePolicyDataWithClient` | Simulate PolicyData using stored secrets (requires ownership) |
 | `newt_storeEncryptedSecrets` | Store encrypted secrets for a PolicyClient |
-| `newt_registerWebhook` | Register a webhook for task completion notifications |
+| `newt_getPrivacyPublicKey` | Fetch the gateway's X25519 HPKE public key |
+| `newt_uploadEncryptedData` | Upload HPKE-encrypted data to the gateway |
+| `newt_registerWebhook` | Register a webhook for task completion notifications (gateway-only, no SDK wrapper) |
 
 **Authentication:** All API requests require a Bearer token in the `Authorization` header.
 
