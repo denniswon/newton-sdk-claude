@@ -70,12 +70,11 @@ Newton Protocol is a **policy engine for onchain transaction authorization**, bu
 
 ## Gateway URLs
 
-| Network | Environment | URL |
-|---------|-------------|-----|
-| Sepolia | Staging | `https://gateway-avs.stagef.sepolia.newt.foundation/rpc` |
-| Sepolia | Production | `https://gateway-avs.sepolia.newt.foundation/rpc` |
-| Mainnet | Staging | `https://gateway-avs.stagef.newt.foundation/rpc` |
-| Mainnet | Production | `https://gateway-avs.newt.foundation/rpc` |
+| Network | URL |
+|---------|-----|
+| Sepolia | `https://gateway.testnet.newton.xyz/rpc` |
+| Base Sepolia | `https://gateway.testnet.newton.xyz/rpc` |
+| Mainnet | `https://gateway.newton.xyz/rpc` |
 
 ## Source of Truth
 

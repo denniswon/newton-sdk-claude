@@ -139,7 +139,7 @@ See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
 
 ## Documentation Site (`site/`)
 
-The `site/` directory contains the full [docs.newt.foundation](https://docs.newt.foundation) documentation site, hosted via [Mintlify](https://mintlify.com). It was imported from the `foundation-docs` repo via `git subtree`.
+The `site/` directory contains the full [docs.newton.xyz](https://docs.newton.xyz) documentation site, hosted via [Mintlify](https://mintlify.com). It was imported from the `foundation-docs` repo via `git subtree`.
 
 ### Structure
 
