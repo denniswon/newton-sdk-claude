@@ -121,13 +121,13 @@ All client actions accept optional `SdkOverrides` for custom gateway URL, task m
 
 Client-side HPKE encryption for privacy-preserving policy evaluation. Shipped on main.
 
-Exports: `createSecureEnvelope`, `generateSigningKeyPair`, `signPrivacyAuthorization`, `getPrivacyPublicKey`, `uploadEncryptedData`, `storeEncryptedSecrets`
+Exports: `createSecureEnvelope`, `getPrivacyPublicKey`, `uploadEncryptedData`, `uploadSecureEnvelope`
 
 Key properties:
 - Zero server round-trips during encryption — fully offline capable
 - HPKE suite: X25519 KEM + HKDF-SHA256 + ChaCha20-Poly1305 (RFC 9180)
-- Ed25519 authorization signatures for consent-based data access
-- 11 unit tests covering envelope creation, key generation, and dual-signature authorization
+- Ed25519 signing with caller-provided `Uint8Array` key (caller owns buffer lifecycle)
+- `uploadSecureEnvelope` for uploading pre-built envelopes separately from encryption
 
 See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
 

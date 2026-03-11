@@ -161,24 +161,27 @@ ABIs in `src/abis/` are synced from the `newton-prover-avs` repository:
 
 When contract interfaces change upstream, the ABI files must be re-synced before the SDK can use the new functions.
 
-## Privacy Module (Planned)
+## Privacy Module
 
-The privacy module will add client-side HPKE encryption:
+Client-side HPKE encryption for privacy-preserving policy evaluation. Shipped on main.
 
 ```
 src/modules/privacy/
-├── index.ts          # Public API: encryptPrivacyData, uploadEncryptedData, authorizePrivacyData
-├── hpke.ts           # HPKE encrypt/decrypt (X25519 + ChaCha20-Poly1305)
-├── envelope.ts       # SecureEnvelope construction with AAD binding
-├── auth.ts           # Ed25519 authorization signatures (user + app dual-sig)
-└── keys.ts           # Key derivation helpers
+├── index.ts          # Public API: createSecureEnvelope, getPrivacyPublicKey, uploadEncryptedData, uploadSecureEnvelope
+└── privacy.test.ts   # Unit tests
 ```
 
-Design constraints:
+Exports:
+- `createSecureEnvelope(params, signingKey: Uint8Array)` — offline HPKE encryption, zero network calls
+- `getPrivacyPublicKey(chainId, apiKey)` — fetch gateway's X25519 public key via RPC
+- `uploadEncryptedData(chainId, apiKey, params)` — encrypt + upload combo (1-2 RPC calls)
+- `uploadSecureEnvelope(chainId, apiKey, params)` — upload a pre-built envelope (1 RPC call)
+
+Design properties:
 - **Zero server round-trips** during encryption — gateway public key fetched once and cached
 - **Offline capable** — all crypto operations run locally
-- **Bundle < 50KB** — minimal WASM or pure JS crypto
 - **AAD binding** — ciphertext bound to `keccak256(policyClient, chainId)` to prevent cross-context replay
+- **Caller-owned key lifecycle** — `signingKey` is `Uint8Array`, caller zeroes when done
 
 ## Design Principles
 

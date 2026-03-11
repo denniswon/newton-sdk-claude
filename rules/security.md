@@ -141,28 +141,29 @@ window.addEventListener('message', (event) => {
 - Handle popup blockers gracefully
 - Clean up event listeners on close
 
-## Privacy Module Security (Planned)
-
-When implementing the privacy module (NEWT-627):
+## Privacy Module Security
 
 ### Key Material
 
 - HPKE ephemeral keypairs generated per encryption — never reused
 - Gateway public key fetched via `newt_getPrivacyPublicKey` RPC and cached
-- Ed25519 signing keys derived from user's wallet — never exported
+- Ed25519 signing key provided by caller as `Uint8Array` — function copies internally and zeroes the copy after signing
+- Caller owns the signing key buffer lifecycle and is responsible for zeroing it when done
 - All key material lives in memory only — never persisted to storage
 
 ### Encryption
 
 - HPKE Base mode (RFC 9180): X25519 KEM + HKDF-SHA256 + ChaCha20-Poly1305
-- AAD binding: `keccak256(policyClient, chainId)` prevents cross-context replay
+- AAD binding: `keccak256(abi.encodePacked(policyClient, chainId))` prevents cross-context replay
+- Chain ID encoded as big-endian u64 via `DataView.setBigUint64` for Rust parity
 - Envelope format includes ephemeral public key for recipient decryption
 
-### Authorization Signatures
+### Input Validation
 
-- Dual Ed25519 signatures (user + app) required for privacy data access
-- Signature covers: `keccak256(policyClient, intentHash, refIds...)`
-- Prevents unauthorized use of encrypted data across policy contexts
+- `recipientPublicKey` validated as 32-byte X25519 key
+- `signingKey` validated as 32-byte Ed25519 seed
+- `policyClient` validated with viem's `isAddress`
+- Hex inputs validated with viem's `isHex` before conversion
 
 ## Dependency Security
 
