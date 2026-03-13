@@ -167,7 +167,7 @@ Client-side HPKE encryption for privacy-preserving policy evaluation. Shipped on
 
 ```
 src/modules/privacy/
-├── index.ts          # Public API: createSecureEnvelope, getPrivacyPublicKey, uploadEncryptedData, uploadSecureEnvelope
+├── index.ts          # Public API: createSecureEnvelope, getPrivacyPublicKey, uploadEncryptedData, uploadSecureEnvelope, generateSigningKeyPair, storeEncryptedSecrets, signPrivacyAuthorization
 └── privacy.test.ts   # Unit tests
 ```
 
@@ -176,6 +176,9 @@ Exports:
 - `getPrivacyPublicKey(chainId, apiKey)` — fetch gateway's X25519 public key via RPC
 - `uploadEncryptedData(chainId, apiKey, params)` — encrypt + upload combo (1-2 RPC calls)
 - `uploadSecureEnvelope(chainId, apiKey, params)` — upload a pre-built envelope (1 RPC call)
+- `generateSigningKeyPair()` — generate Ed25519 key pair for privacy signatures
+- `storeEncryptedSecrets(chainId, apiKey, params)` — upload KMS-encrypted secrets for PolicyData
+- `signPrivacyAuthorization(params)` — compute dual Ed25519 signatures for privacy-enabled tasks
 
 Design properties:
 - **Zero server round-trips** during encryption — gateway public key fetched once and cached

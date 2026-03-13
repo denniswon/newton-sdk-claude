@@ -29,12 +29,12 @@ import { createPublicClient, createWalletClient } from 'viem'
 import { newtonPublicClientActions, newtonWalletClientActions } from '@magicnewton/newton-protocol-sdk'
 
 const publicClient = createPublicClient({ ... }).extend(newtonPublicClientActions())
-const walletClient = createWalletClient({ ... }).extend(newtonWalletClientActions({ apiKey: 'your-api-key' }))
+const walletClient = createWalletClient({ ... }).extend(newtonWalletClientActions({ apiKey: 'your-api-key', policyContractAddress: '0x...' }))
 ```
 
 **Public client actions** (read-only): `waitForTaskResponded`, `getTaskStatus`, `getTaskResponseHash`, policy reads, `precomputePolicyId`
 
-**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions
+**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions, identity functions (`connectIdentityWithNewton`, `registerUserData`, `linkApp`, `unlinkApp`)
 
 ### Module Structure
 
@@ -56,7 +56,10 @@ src/
 ├── types/
 │   ├── index.ts          # Re-exports
 │   ├── task.ts           # Intent, Task, TaskResponse, SimulateParams
-│   └── policy.ts         # PolicyId, PolicyParamsJson, SetPolicyInput
+│   ├── policy.ts         # PolicyId, PolicyParamsJson, SetPolicyInput
+│   ├── privacy.ts        # SecureEnvelope, HPKE types
+│   ├── identity.ts       # KycUserData
+│   └── core/             # Exception types, JSON-RPC types
 └── utils/
     ├── https.ts          # AvsHttpService — JSON-RPC over HTTP with API key
     ├── intent.ts         # normalizeIntent, sanitizeIntentForRequest
@@ -121,7 +124,7 @@ All client actions accept optional `SdkOverrides` for custom gateway URL, task m
 
 Client-side HPKE encryption for privacy-preserving policy evaluation. Shipped on main.
 
-Exports: `createSecureEnvelope`, `getPrivacyPublicKey`, `uploadEncryptedData`, `uploadSecureEnvelope`
+Exports: `createSecureEnvelope`, `getPrivacyPublicKey`, `uploadEncryptedData`, `uploadSecureEnvelope`, `generateSigningKeyPair`, `storeEncryptedSecrets`, `signPrivacyAuthorization`
 
 Key properties:
 - Zero server round-trips during encryption — fully offline capable
