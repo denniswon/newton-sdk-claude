@@ -48,6 +48,7 @@ Newton Protocol is a **policy engine for onchain transaction authorization**, bu
 | `newt_storeEncryptedSecrets` | Store encrypted secrets for a PolicyClient |
 | `newt_getPrivacyPublicKey` | Fetch the gateway's X25519 HPKE public key |
 | `newt_uploadEncryptedData` | Upload HPKE-encrypted data to the gateway |
+| `newt_sendIdentityEncrypted` | Submit EIP-712 signed encrypted identity data to the IdentityRegistry |
 | `newt_registerWebhook` | Register a webhook for task completion notifications (gateway-only, no SDK wrapper) |
 
 **Authentication:** All API requests require a Bearer token in the `Authorization` header.

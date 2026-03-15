@@ -34,7 +34,7 @@ const walletClient = createWalletClient({ ... }).extend(newtonWalletClientAction
 
 **Public client actions** (read-only): `waitForTaskResponded`, `getTaskStatus`, `getTaskResponseHash`, policy reads, `precomputePolicyId`
 
-**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions, identity functions (`connectIdentityWithNewton`, `registerUserData`, `linkApp`, `unlinkApp`)
+**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions, identity functions (`sendIdentityEncrypted`)
 
 ### Module Structure
 
@@ -48,6 +48,7 @@ src/
 │   └── newtonPolicyAbi.ts # Policy contract ABI
 ├── modules/
 │   ├── avs/              # Core AVS interaction (task submission, evaluation, WebSocket)
+│   ├── identity/         # EIP-712 signed identity data submission
 │   ├── policy/           # Policy contract read/write wrappers
 │   └── privacy/          # HPKE encryption, Ed25519 signing, upload helpers
 ├── popup-prompt.ts       # Newton Wallet popup overlay renderer
@@ -58,7 +59,7 @@ src/
 │   ├── task.ts           # Intent, Task, TaskResponse, SimulateParams
 │   ├── policy.ts         # PolicyId, PolicyParamsJson, SetPolicyInput
 │   ├── privacy.ts        # SecureEnvelope, HPKE types
-│   ├── identity.ts       # KycUserData
+│   ├── identity.ts       # SendIdentityEncryptedParams, identity domain types
 │   └── core/             # Exception types, JSON-RPC types
 └── utils/
     ├── https.ts          # AvsHttpService — JSON-RPC over HTTP with API key
@@ -133,6 +134,20 @@ Key properties:
 - `uploadSecureEnvelope` for uploading pre-built envelopes separately from encryption
 
 See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
+
+## Identity Module
+
+EIP-712 signed identity data submission to the on-chain IdentityRegistry. Supports flexible identity domains beyond KYC.
+
+Exports: `sendIdentityEncrypted`, `identityDomainHash`, `linkIdentity`, `linkIdentityAsSigner`, `linkIdentityAsSignerAndUser`, `linkIdentityAsUser`, `unlinkIdentityAsSigner`, `unlinkIdentityAsUser`
+
+Key properties:
+- Gateway RPC: `sendIdentityEncrypted` submits EIP-712 signed data via `newt_sendIdentityEncrypted`
+- On-chain: `linkIdentity*` / `unlinkIdentity*` are direct `writeContract` calls to IdentityRegistry
+- EIP-712 domain: `{name: "IdentityRegistry", version: "1", chainId, verifyingContract}`
+- Single struct `EncryptedIdentityData { string data }` works across all identity domains
+- Domain identified by `keccak256(domainName)` — e.g., `identityDomainHash("kyc")`
+- IdentityRegistry contract address resolved per-chain from `IDENTITY_REGISTRY` in `const.ts`
 
 ## Key Principles
 

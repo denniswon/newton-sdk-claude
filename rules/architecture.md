@@ -78,6 +78,24 @@ Key functions:
 - `waitForTaskResponded` — polls contract events + WebSocket for task response
 - `simulateTask/Policy/PolicyData` — simulation helpers
 
+### `modules/identity/`
+
+Identity data submission and identity-to-PolicyClient linking on the IdentityRegistry.
+
+Key functions (gateway RPC):
+- `sendIdentityEncrypted` — sign `EncryptedIdentityData { string data }` with EIP-712 and submit via `newt_sendIdentityEncrypted` RPC
+- `identityDomainHash` — compute `keccak256(toBytes(domainName))` for the `identity_domain` bytes32 field
+
+Key functions (on-chain `writeContract`):
+- `linkIdentityAsSignerAndUser` — link when caller is both identity owner and client user
+- `linkIdentityAsSigner` — link as identity owner with counterparty signature from client user
+- `linkIdentityAsUser` — link as client user with counterparty signature from identity owner
+- `linkIdentity` — link as 3rd party with signatures from both parties
+- `unlinkIdentityAsSigner` — unlink as identity owner
+- `unlinkIdentityAsUser` — unlink as client user
+
+Design: single `EncryptedIdentityData` struct across all domains (data is encrypted, so per-field wallet display provides no benefit). The `identity_domain` hash tells the gateway how to interpret the blob after decryption.
+
 ### `modules/policy/`
 
 Policy contract wrappers — thin viem `readContract`/`writeContract` calls.
@@ -144,8 +162,9 @@ sequenceDiagram
 
 All contract addresses live in `src/const.ts`, keyed by chain ID:
 
-- `TASK_MANAGER_ADDRESSES` — Newton Prover TaskManager per chain
-- `ATTESTATION_VALIDATOR_ADDRESSES` — AttestationValidator per chain
+- `NEWTON_PROVER_TASK_MANAGER` — Newton Prover TaskManager per chain
+- `ATTESTATION_VALIDATOR` — AttestationValidator per chain
+- `IDENTITY_REGISTRY` — IdentityRegistry per chain
 - `GATEWAY_API_URLS` — Gateway HTTP endpoints per chain
 
 These can be overridden per-call via `SdkOverrides`.
