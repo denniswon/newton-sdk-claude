@@ -34,7 +34,7 @@ const walletClient = createWalletClient({ ... }).extend(newtonWalletClientAction
 
 **Public client actions** (read-only): `waitForTaskResponded`, `getTaskStatus`, `getTaskResponseHash`, policy reads, `precomputePolicyId`
 
-**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions, identity functions (`sendIdentityEncrypted`)
+**Wallet client actions** (write): `submitEvaluationRequest`, `evaluateIntentDirect`, `submitIntentAndSubscribe`, simulate functions, policy writes, privacy functions, identity link/unlink functions
 
 ### Module Structure
 
@@ -45,7 +45,8 @@ src/
 ├── sdk-exceptions.ts     # SDKError, MagicRPCError
 ├── abis/                 # Contract ABIs (auto-synced from newton-prover-avs)
 │   ├── newtonAbi.ts      # TaskManager + AttestationValidator ABIs
-│   └── newtonPolicyAbi.ts # Policy contract ABI
+│   ├── newtonPolicyAbi.ts # Policy contract ABI
+│   └── newtonIdentityRegistryAbi.ts # IdentityRegistry ABI
 ├── modules/
 │   ├── avs/              # Core AVS interaction (task submission, evaluation, WebSocket)
 │   ├── identity/         # EIP-712 signed identity data submission
@@ -59,7 +60,7 @@ src/
 │   ├── task.ts           # Intent, Task, TaskResponse, SimulateParams
 │   ├── policy.ts         # PolicyId, PolicyParamsJson, SetPolicyInput
 │   ├── privacy.ts        # SecureEnvelope, HPKE types
-│   ├── identity.ts       # SendIdentityEncryptedParams, identity domain types
+│   ├── identity.ts       # Link/unlink params, identity domain types
 │   └── core/             # Exception types, JSON-RPC types
 └── utils/
     ├── https.ts          # AvsHttpService — JSON-RPC over HTTP with API key
@@ -97,6 +98,7 @@ All client actions accept optional `SdkOverrides` for custom gateway URL, task m
 |------|--------|
 | `src/abis/newtonAbi.ts` | Synced from `newton-prover-avs` contracts via `pnpm sync-abis` |
 | `src/abis/newtonPolicyAbi.ts` | Synced from `newton-prover-avs` contracts via `pnpm sync-abis` |
+| `src/abis/newtonIdentityRegistryAbi.ts` | Synced from `newton-prover-avs` contracts via `pnpm sync-abis` |
 | `dist/` | `pnpm build` output |
 
 ## Essential Commands
@@ -139,14 +141,13 @@ See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
 
 EIP-712 signed identity data submission to the on-chain IdentityRegistry. Supports flexible identity domains beyond KYC.
 
-Exports: `sendIdentityEncrypted`, `identityDomainHash`, `linkIdentity`, `linkIdentityAsSigner`, `linkIdentityAsSignerAndUser`, `linkIdentityAsUser`, `unlinkIdentityAsSigner`, `unlinkIdentityAsUser`
+Exports: `identityDomainHash`, `linkIdentity`, `linkIdentityAsSigner`, `linkIdentityAsSignerAndUser`, `linkIdentityAsUser`, `unlinkIdentityAsSigner`, `unlinkIdentityAsUser`
 
 Key properties:
-- Gateway RPC: `sendIdentityEncrypted` submits EIP-712 signed data via `newt_sendIdentityEncrypted`
 - On-chain: `linkIdentity*` / `unlinkIdentity*` are direct `writeContract` calls to IdentityRegistry
-- EIP-712 domain: `{name: "IdentityRegistry", version: "1", chainId, verifyingContract}`
-- Single struct `EncryptedIdentityData { string data }` works across all identity domains
 - Domain identified by `keccak256(domainName)` — e.g., `identityDomainHash("kyc")`
+- IdentityRegistry contract address resolved per-chain from `IDENTITY_REGISTRY` in `const.ts`
+- Gateway RPC (`newt_sendIdentityEncrypted`) is called by newton-identity popup directly, not wrapped by the SDK
 - IdentityRegistry contract address resolved per-chain from `IDENTITY_REGISTRY` in `const.ts`
 
 ## Key Principles

@@ -82,8 +82,7 @@ Key functions:
 
 Identity data submission and identity-to-PolicyClient linking on the IdentityRegistry.
 
-Key functions (gateway RPC):
-- `sendIdentityEncrypted` — sign `EncryptedIdentityData { string data }` with EIP-712 and submit via `newt_sendIdentityEncrypted` RPC
+Key functions (utility):
 - `identityDomainHash` — compute `keccak256(toBytes(domainName))` for the `identity_domain` bytes32 field
 
 Key functions (on-chain `writeContract`):
@@ -94,7 +93,7 @@ Key functions (on-chain `writeContract`):
 - `unlinkIdentityAsSigner` — unlink as identity owner
 - `unlinkIdentityAsUser` — unlink as client user
 
-Design: single `EncryptedIdentityData` struct across all domains (data is encrypted, so per-field wallet display provides no benefit). The `identity_domain` hash tells the gateway how to interpret the blob after decryption.
+The gateway RPC (`newt_sendIdentityEncrypted`) is called by the newton-identity popup directly, not wrapped by the SDK. Post-HPKE migration, the popup will use the SDK's privacy module for encryption and a new `registerIdentityDataRef` wrapper for on-chain ref storage.
 
 ### `modules/policy/`
 
