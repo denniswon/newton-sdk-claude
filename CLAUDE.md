@@ -148,7 +148,7 @@ Key properties:
 - On-chain: `linkIdentity*` / `unlinkIdentity*` are direct `writeContract` calls to IdentityRegistry
 - Domain identified by `keccak256(domainName)` — e.g., `identityDomainHash("kyc")`
 - IdentityRegistry contract address resolved per-chain from `IDENTITY_REGISTRY` in `const.ts`
-- Gateway RPC (`newt_uploadIdentityEncrypted`) is called by newton-identity popup to upload encrypted data; the SDK wraps only the on-chain registration step
+- Gateway RPC: `newt_sendIdentityEncrypted` (Phase 1) / `newt_uploadIdentityEncrypted` (Phase 2) is called by the newton-identity popup directly; the SDK wraps only the on-chain `registerIdentityData` step
 
 ## Key Principles
 
