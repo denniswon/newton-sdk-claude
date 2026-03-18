@@ -80,12 +80,13 @@ Key functions:
 
 ### `modules/identity/`
 
-Identity data submission and identity-to-PolicyClient linking on the IdentityRegistry.
+Identity data registration and identity-to-PolicyClient linking on the IdentityRegistry.
 
 Key functions (utility):
 - `identityDomainHash` — compute `keccak256(toBytes(domainName))` for the `identity_domain` bytes32 field
 
 Key functions (on-chain `writeContract`):
+- `registerIdentityData` — store identity data reference on-chain with gateway co-signature (`REGISTER_IDENTITY_TYPEHASH`)
 - `linkIdentityAsSignerAndUser` — link when caller is both identity owner and client user
 - `linkIdentityAsSigner` — link as identity owner with counterparty signature from client user
 - `linkIdentityAsUser` — link as client user with counterparty signature from identity owner
@@ -93,7 +94,7 @@ Key functions (on-chain `writeContract`):
 - `unlinkIdentityAsSigner` — unlink as identity owner
 - `unlinkIdentityAsUser` — unlink as client user
 
-The gateway RPC (`newt_sendIdentityEncrypted`) is called by the newton-identity popup directly, not wrapped by the SDK. Post-HPKE migration, the popup will use the SDK's privacy module for encryption and a new `registerIdentityDataRef` wrapper for on-chain ref storage.
+The gateway RPC (`newt_uploadIdentityEncrypted`) is called by the newton-identity popup to upload encrypted data and obtain a `data_ref_id` + gateway signature. The SDK wraps the on-chain `registerIdentityData` call. Post-HPKE migration, the popup will also use the SDK's privacy module for encryption.
 
 ### `modules/policy/`
 

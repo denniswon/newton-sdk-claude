@@ -49,7 +49,7 @@ src/
 │   └── newtonIdentityRegistryAbi.ts # IdentityRegistry ABI
 ├── modules/
 │   ├── avs/              # Core AVS interaction (task submission, evaluation, WebSocket)
-│   ├── identity/         # EIP-712 signed identity data submission
+│   ├── identity/         # Identity data registration and link/unlink
 │   ├── policy/           # Policy contract read/write wrappers
 │   └── privacy/          # HPKE encryption, Ed25519 signing, upload helpers
 ├── popup-prompt.ts       # Newton Wallet popup overlay renderer
@@ -139,16 +139,16 @@ See newton-prover-avs `docs/PRIVACY.md` for full protocol spec.
 
 ## Identity Module
 
-EIP-712 signed identity data submission to the on-chain IdentityRegistry. Supports flexible identity domains beyond KYC.
+Identity data registration and identity-to-PolicyClient linking on the on-chain IdentityRegistry. Supports flexible identity domains beyond KYC.
 
-Exports: `identityDomainHash`, `linkIdentity`, `linkIdentityAsSigner`, `linkIdentityAsSignerAndUser`, `linkIdentityAsUser`, `unlinkIdentityAsSigner`, `unlinkIdentityAsUser`
+Exports: `registerIdentityData`, `identityDomainHash`, `linkIdentity`, `linkIdentityAsSigner`, `linkIdentityAsSignerAndUser`, `linkIdentityAsUser`, `unlinkIdentityAsSigner`, `unlinkIdentityAsUser`
 
 Key properties:
+- On-chain: `registerIdentityData` stores identity data ref with gateway co-signature
 - On-chain: `linkIdentity*` / `unlinkIdentity*` are direct `writeContract` calls to IdentityRegistry
 - Domain identified by `keccak256(domainName)` — e.g., `identityDomainHash("kyc")`
 - IdentityRegistry contract address resolved per-chain from `IDENTITY_REGISTRY` in `const.ts`
-- Gateway RPC (`newt_sendIdentityEncrypted`) is called by newton-identity popup directly, not wrapped by the SDK
-- IdentityRegistry contract address resolved per-chain from `IDENTITY_REGISTRY` in `const.ts`
+- Gateway RPC (`newt_uploadIdentityEncrypted`) is called by newton-identity popup to upload encrypted data; the SDK wraps only the on-chain registration step
 
 ## Key Principles
 
