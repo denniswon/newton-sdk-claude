@@ -171,6 +171,9 @@ site/
 ├── docs.json                    # Mintlify config (navigation, redirects, SEO)
 ├── style.css                    # Custom CSS overrides
 ├── favicon.svg
+├── llms.txt                     # LLM-consumable sitemap (llms.txt convention)
+├── .mintlify/
+│   └── Assistant.md             # Mintlify AI Assistant custom instructions
 ├── developers/                  # Developers tab (34 pages)
 │   ├── overview/                #   Getting Started
 │   ├── guides/                  #   Guides
